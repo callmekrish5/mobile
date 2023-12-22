@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../appointment/presentation/view/doctorappointment.dart';
+import 'package:my_app/db/data.dart';
+import 'package:my_app/db/doctor.dart';
+import '../../../../config/router/app_route.dart';
 import 'category.dart';
-import 'doctorlist.dart';
 import '../viewmodel/logout_view_model.dart';
 import 'package:shake/shake.dart';
 
 import '../../../../core/common/provider/internet_connectivity.dart';
-import '../../../../core/common/snackbar/my_snackbar.dart';
 import '../../domain/entity/home_entity.dart';
 import '../viewmodel/home_view_model.dart';
 
@@ -20,6 +20,8 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   late ShakeDetector detector;
+
+  final List<Doctor> _doctors = Data.doctorList;
 
   @override
   void initState() {
@@ -61,38 +63,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         padding: const EdgeInsets.all(10),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                  child: Row(
-                    children: [
-                      CategoryScreen(
-                        categoryName: 'Dentist',
-                        iconImage:
-                            'https://static.thenounproject.com/png/100330-200.png',
-                      ),
-                      CategoryScreen(
-                        categoryName: 'Surgeon',
-                        iconImage:
-                            'https://cdn-icons-png.flaticon.com/512/5793/5793639.png',
-                      ),
-                      CategoryScreen(
-                        categoryName: 'Cardiologist',
-                        iconImage:
-                            'https://cdn-icons-png.flaticon.com/512/3467/3467794.png',
-                      ),
-                      CategoryScreen(
-                        categoryName: 'Therapist',
-                        iconImage:
-                            'https://cdn-icons-png.flaticon.com/512/1971/1971437.png',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              _gap,
-              Row(
+               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
@@ -118,17 +91,129 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ],
               ),
               _gap,
-               for(int i = 0; i<=10; i++)...{
-                Card(
-                color: Colors.amber,
-                child: ListTile(
-                  leading: Image.network('https://cdn-icons-png.flaticon.com/512/1971/1971437.png'),
-                  iconColor: Colors.amber,
-                  title: const Text('Mr.do'),
-                  subtitle: const Text('Cardiologist'),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+
+                      
+                      CategoryScreen(
+                        categoryName: 'Dentist',
+                        iconImage:
+                            'https://static.thenounproject.com/png/100330-200.png',
+                      ),
+                      CategoryScreen(
+                        categoryName: 'Surgeon',
+                        iconImage:
+                            'https://cdn-icons-png.flaticon.com/512/5793/5793639.png',
+                      ),
+                      CategoryScreen(
+                        categoryName: 'Cardiologist',
+                        iconImage:
+                            'https://cdn-icons-png.flaticon.com/512/3467/3467794.png',
+                      ),
+                      CategoryScreen(
+                        categoryName: 'Therapist',
+                        iconImage:
+                            'https://cdn-icons-png.flaticon.com/512/1971/1971437.png',
+                      ),
+                    ],
+                  ),
                 ),
               ),
-               }
+              
+             
+              _gap,
+              const Text(
+                    'All Doctors',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      // fontFamily: 'OpenSans',
+                      fontSize: 30,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                  _gap,
+              for (int i = 0; i < _doctors.length; i++) ...{
+                GestureDetector(
+                  onTap: () {
+                    print('Doctor name: ${_doctors[i].fullName}');
+
+                    Navigator.pushNamed(context, AppRoute.takeAppointmentROute, arguments: _doctors[i]);
+                  },
+                  child: Card(
+                    elevation: 5, // Added elevation for a shadow effect
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16), // Added margin for spacing
+
+                    // Changed color to a more subtle shade
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(15), // Added rounded corners
+                    ),
+
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 12),
+
+                            // Wrapped CircleAvatar with a Container for more control
+                            leading: Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(_doctors[i].picture),
+                                ),
+                              ),
+                            ),
+
+                            // Changed title text style for better readability
+                            title: Text(
+                              _doctors[i].fullName.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            // Changed subtitle text color for better contrast
+                            subtitle: Text(
+                              _doctors[i].specialization,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Available time: ${_doctors[i].availableTime}',
+                          ),
+                          Text(
+                            'Depature time: ${_doctors[i].depatureTime}',
+                          ),
+                          Text(
+                            'Consultant fee: ${_doctors[i].consultantFee}',
+                          ),
+                          Text(
+                            'Hospital: ${_doctors[i].hospitalName}',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              }
             ],
           ),
         ),
@@ -269,13 +354,13 @@ class _HomePageState extends ConsumerState<HomePage> {
 //           child: ListView.builder(
 //             scrollDirection: Axis.vertical,
 //             itemCount: homeList.length,
-//             itemBuilder: (context, index) {
+//             itemBuilder: (context, i) {
 //           return Column(
 //             children: [
 //               DoctorList(
 //                 DoctorImage: 'https://th.bing.com/th/id/OIP.xf9TkDAN4uIhHezoIacDhQHaHk?pid=ImgDet&w=920&h=940&rs=1',
-//                 doctorname: "${homeList[index].firstName} ${homeList[index].lastName}",
-//                 doctorspeciality: homeList[index].specialization,
+//                 doctorname: "${homeList[i].firstName} ${homeList[i].lastName}",
+//                 doctorspeciality: homeList[i].specialization,
 //               ),
 //               const SizedBox(height: 15), // Add space after each doctor list
 //             ],
