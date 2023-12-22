@@ -1,5 +1,6 @@
+import 'package:my_app/features/user/presentation/view/take_appointment_view.dart';
+
 import '../../features/appointment/presentation/view/doctorappointment.dart';
-import '../../features/appointment/presentation/view/appointments.dart';
 import '../../features/home/presentation/view/dashboard.dart';
 import '../../features/home/presentation/view/admin/adminnavigation.dart';
 import '../../features/home/presentation/view/bottom_navigation.dart';
@@ -19,19 +20,21 @@ class AppRoute {
   static const String loginRoute = '/login';
   static const String registerRoute = '/register';
   static String adminRoute = '/admin';
-  static String appointmentRoute="/appointment";
-  static String profileRoute='/profile';
+  static String appointmentRoute = "/appointment";
+  static String profileRoute = '/profile';
+  static String takeAppointmentROute = '/takeAppointment';
 
   static getApplicationRoute() {
     return {
       splashRoute: (context) => const SplashView(),
+      takeAppointmentROute: (context) => const TakeAppointmentView(),
       loginRoute: (context) => const LogInView(),
       homeRoute: (context) => const HomeView(),
       doctorRoute: (context) => const HomePage(),
       registerRoute: (context) => const RegisterView(),
       adminRoute: (context) => const AdminView(),
-      appointmentRoute:(context)=>const DoctorAppointmentPage(),
-      profileRoute:(context)=>const UserProfilePage(),
+      appointmentRoute: (context) => const DoctorAppointmentPage(),
+      profileRoute: (context) => const UserProfilePage(),
     };
   }
 }
