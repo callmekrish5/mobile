@@ -26,47 +26,40 @@ class _AppointmentViewState extends ConsumerState<AppointmentView> {
       appBar: AppBar(
         title: const Text('My Appointments'),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await ref
-              .read(appointmentViewModelProvider.notifier)
-              .getAppointments();
-          showSnackBar(message: 'Refressing...', context: context);
-        },
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white, Colors.black], // Add your gradient colors
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+      body: SingleChildScrollView(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await ref
+                .read(appointmentViewModelProvider.notifier)
+                .getAppointments();
+            showSnackBar(message: 'Refressing...', context: context);
+          },
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.black], // Add your gradient colors
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                    child: Text(
-                      'Your Appointments',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.cyan,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  for (int i = 0; i < myAppointments.length; i++) ...{
-                    AppointmentCard(
-                      date: myAppointments[i].date,
-                      time: myAppointments[i].time,
-                      hospitalName: myAppointments[i].hospitalName,
-                      doctorName: myAppointments[i].doctorName,
-                    )
-                  }
-                ],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    
+                    const SizedBox(height: 16),
+                    for (int i = 0; i < myAppointments.length; i++) ...{
+                      AppointmentCard(
+                        date: myAppointments[i].date,
+                        time: myAppointments[i].time,
+                        hospitalName: myAppointments[i].hospitalName,
+                        doctorName: myAppointments[i].doctorName,
+                      )
+                    }
+                  ],
+                ),
               ),
             ),
           ),
