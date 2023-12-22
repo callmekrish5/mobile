@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/db/take_appointment.dart';
+import '../../../../db/data.dart';
 import '../../domain/entity/appointment_entity.dart';
 import '../viewmodel/appointment_view_model.dart';
 
@@ -18,30 +20,21 @@ class _AppointmentViewState extends ConsumerState<AppointmentView> {
     var AppointmentState = ref.watch(appointmentViewModelProvider);
     List<AppointmentEntity> appointmentList = AppointmentState.appointments;
 
+    List<TakeAppointment> myAppointments = Data.myAppointmentList;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Appointments'),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {
-        //       ref.read(appointmentViewModelProvider.notifier).getAppointments();
-        //       // ref.read(courseViewModelProvider.notifier).getCourses();
-        //       showSnackBar(message: 'Refressing...', context: context);
-        //     },
-        //     icon: const Icon(
-        //       Icons.refresh,
-        //       color: Colors.white,
-        //     ),
-        //   ),
-        // ]
+        title: const Text('My Appointments'),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(appointmentViewModelProvider.notifier).getAppointments();
+          await ref
+              .read(appointmentViewModelProvider.notifier)
+              .getAppointments();
           showSnackBar(message: 'Refressing...', context: context);
         },
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.white, Colors.black], // Add your gradient colors
               begin: Alignment.topCenter,
@@ -49,35 +42,32 @@ class _AppointmentViewState extends ConsumerState<AppointmentView> {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Your Appointments',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.cyan,
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(
+                    child: Text(
+                      'Your Appointments',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.cyan,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: appointmentList.length,
-                    itemBuilder: (context, index) {
-                      final appointment = appointmentList[index];
-                      return AppointmentCard(
-                        date: appointment.date,
-                        time: appointment.time,
-                        status: "approved",
-                      );
-                    },
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  for (int i = 0; i < myAppointments.length; i++) ...{
+                    AppointmentCard(
+                      date: myAppointments[i].date,
+                      time: myAppointments[i].time,
+                      hospitalName: myAppointments[i].hospitalName,
+                      doctorName: myAppointments[i].doctorName,
+                    )
+                  }
+                ],
+              ),
             ),
           ),
         ),
@@ -89,13 +79,15 @@ class _AppointmentViewState extends ConsumerState<AppointmentView> {
 class AppointmentCard extends StatefulWidget {
   final String date;
   final String time;
-  final String status;
+  final String hospitalName;
+  final String doctorName;
 
   const AppointmentCard({
     super.key,
     required this.date,
     required this.time,
-    required this.status,
+    required this.hospitalName,
+    required this.doctorName,
   });
 
   @override
@@ -106,8 +98,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 140,
-      width: 500, // Adjust the height as per your preference
+      // height: 140,
+      width: double.infinity, // Adjust the height as per your preference
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -119,7 +111,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.date,
+                'Dr.${widget.doctorName}',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -128,7 +120,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.time,
+                'Hospital: ${widget.hospitalName}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
@@ -136,7 +128,16 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.status,
+                'Time: ${widget.time}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Date: ${widget.date}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.green,
